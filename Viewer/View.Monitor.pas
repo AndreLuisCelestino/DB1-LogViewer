@@ -12,19 +12,23 @@ uses
   System.Rtti, System.Bindings.Outputs, Vcl.Bind.Editors, Data.Bind.Components, FireDAC.Stan.Intf,
   FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Comp.DataSet,
   FireDAC.Comp.Client, Component.FDLogViewer, Vcl.WinXCtrls, FireDAC.Stan.StorageBin, SynEdit,
-  SynMemo, SynEditHighlighter, SynHighlighterSQL, SQL.Formatter, FireDAC.Phys.Intf, Utils.Options,
-  FireDAC.DApt.Intf, System.ImageList, Vcl.ImgList, Vcl.ToolWin, Vcl.DBCtrls, Component.DBGridLog;
+  SynMemo, SynEditHighlighter, SynHighlighterSQL, SQL.Formatter, Utils.Options,
+  Vcl.DBCtrls, Component.DBGridLog, FireDAC.Phys.Intf, FireDAC.DApt.Intf, System.ImageList,
+  Vcl.ImgList, Vcl.ToolWin;
 
 type
   TfMonitor = class(TForm)
+    ActionClearCache: TAction;
     ActionClearLog: TAction;
     ActionManager: TActionManager;
     ActionOpenFile: TAction;
+    ActionOpenLast: TAction;
     ActionReloadLog: TAction;
     ActionToolBar: TActionToolBar;
     BevelSeparator1: TBevel;
     BevelSeparator2: TBevel;
     CheckBoxAutoUpdate: TCheckBox;
+    ComboBoxDateFormat: TComboBox;
     DataSource: TDataSource;
     DataSourceFilter: TDataSource;
     DBGrid: TDBGrid;
@@ -35,6 +39,7 @@ type
     FDMemTableFilterClass: TStringField;
     FDMemTableFilterDatabase: TStringField;
     FDMemTableFilterDateTime: TStringField;
+    FDMemTableFilterError: TStringField;
     FDMemTableFilterIP: TStringField;
     FDMemTableFilterMethod: TStringField;
     FDMemTableFilterType: TStringField;
@@ -51,11 +56,15 @@ type
     LabelClearFilters: TLabel;
     LabelClearLog: TLabel;
     LabelCopyColumnValue: TLabel;
+    LabelCopyMethodName: TLabel;
     LabelCopySQL: TLabel;
     LabelCtrlC: TLabel;
     LabelCtrlL: TLabel;
+    LabelCtrlM: TLabel;
     LabelCtrlO: TLabel;
     LabelCtrlQ: TLabel;
+    LabelCtrlU: TLabel;
+    LabelDateFormat: TLabel;
     LabeledEditClass: TLabeledEdit;
     LabeledEditDatabase: TLabeledEdit;
     LabeledEditDateTime: TLabeledEdit;
@@ -65,17 +74,22 @@ type
     LabelF4: TLabel;
     LabelF5: TLabel;
     LabelFilterSQL: TLabel;
+    LabelForceToDateFunctionInfo: TLabel;
     LabelIgnoreBasicLogInfo: TLabel;
     LabelInterval: TLabel;
     LabelOpenFile: TLabel;
+    LabelOpenLast: TLabel;
     LabelReloadLog: TLabel;
     LabelRowSelectInfo: TLabel;
     LabelShowLogTab: TLabel;
+    LabelShowOnlySQLInfo: TLabel;
     LabelShowOptionsTab: TLabel;
     LabelShowSQLTab: TLabel;
-    LabelForceToDateFunctionInfo: TLabel;
+    LabelUpdateReminder: TLabel;
+    LabelURL: TLabel;
     LogViewer: TFDLogViewer;
     MenuItemCopyColumnValue: TMenuItem;
+    MenuItemCopyMethodName: TMenuItem;
     MenuItemCopySQL: TMenuItem;
     PageControl: TPageControl;
     PanelDBGridFilter: TPanel;
@@ -84,9 +98,12 @@ type
     PanelOptions: TPanel;
     PanelSQL: TPanel;
     PanelSQLTab: TPanel;
+    PanelUpdateReminder: TPanel;
     PopupMenu: TPopupMenu;
+    RadioGroupStyles: TRadioGroup;
     SpinEditInterval: TSpinEdit;
     Splitter: TSplitter;
+    StatusBarDetails: TStatusBar;
     SynMemoSQL: TSynMemo;
     SynMemoTab: TSynMemo;
     SynSQLSyn: TSynSQLSyn;
@@ -94,73 +111,60 @@ type
     TabSheetOptions: TTabSheet;
     TabSheetSQL: TTabSheet;
     TimerAutoUpdate: TTimer;
+    ToggleSwitchForceToDateFunction: TToggleSwitch;
     ToggleSwitchHighlightErrors: TToggleSwitch;
-    ToggleSwitchIgnoreBasicLog: TToggleSwitch;
+    ToggleSwitchIgnoreServerDMLog: TToggleSwitch;
     ToggleSwitchRowSelect: TToggleSwitch;
     ToggleSwitchShowBottomPanel: TToggleSwitch;
     ToggleSwitchShowLineNumbers: TToggleSwitch;
     ToggleSwitchShowOnlySQL: TToggleSwitch;
     ToggleSwitchStartMaximized: TToggleSwitch;
     ToggleSwitchStayOnTop: TToggleSwitch;
-    ToggleSwitchForceToDateFunction: TToggleSwitch;
-    FDMemTableFilterError: TStringField;
-    PanelUpdateReminder: TPanel;
-    LabelUpdateReminder: TLabel;
-    LabelURL: TLabel;
-    LabelShowOnlySQLInfo: TLabel;
-    RadioGroupStyles: TRadioGroup;
-    ActionOpenLast: TAction;
-    MenuItemCopyMethodName: TMenuItem;
-    LabelCtrlU: TLabel;
-    LabelOpenLast: TLabel;
-    LabelCtrlM: TLabel;
-    LabelCopyMethodName: TLabel;
-    StatusBarDetails: TStatusBar;
-    LabelDateFormat: TLabel;
-    ComboBoxDateFormat: TComboBox;
     procedure ActionClearLogExecute(Sender: TObject);
     procedure ActionOpenFileExecute(Sender: TObject);
+    procedure ActionOpenLastExecute(Sender: TObject);
     procedure ActionReloadLogExecute(Sender: TObject);
     procedure CheckBoxAutoUpdateClick(Sender: TObject);
+    procedure ComboBoxDateFormatChange(Sender: TObject);
     procedure DBGridDblClick(Sender: TObject);
     procedure DBGridFilterColEnter(Sender: TObject);
+    procedure DBGridFilterColResize(Sender: TObject);
     procedure DBGridFilterColumnMoved(Sender: TObject; FromIndex, ToIndex: Integer);
     procedure DBGridFilterKeyPress(Sender: TObject; var Key: Char);
     procedure DBGridKeyPress(Sender: TObject; var Key: Char);
     procedure EditSQLFilterKeyPress(Sender: TObject; var Key: Char);
+    procedure FDMemTableFilterErrorSetText(Sender: TField; const Text: string);
+    procedure FDMemTableFilterTypeSetText(Sender: TField; const Text: string);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
+    procedure LabelForceToDateFunctionInfoClick(Sender: TObject);
     procedure LabelIgnoreBasicLogInfoClick(Sender: TObject);
     procedure LabelRowSelectInfoClick(Sender: TObject);
-    procedure LabelForceToDateFunctionInfoClick(Sender: TObject);
+    procedure LabelShowOnlySQLInfoClick(Sender: TObject);
+    procedure LabelURLClick(Sender: TObject);
     procedure LogViewerAfterScroll(DataSet: TDataSet);
     procedure MenuItemCopyColumnValueClick(Sender: TObject);
+    procedure MenuItemCopyMethodNameClick(Sender: TObject);
     procedure MenuItemCopySQLClick(Sender: TObject);
     procedure PopupMenuPopup(Sender: TObject);
+    procedure RadioGroupStylesClick(Sender: TObject);
     procedure SpinEditIntervalChange(Sender: TObject);
     procedure SplitterMoved(Sender: TObject);
+    procedure TabSheetSQLShow(Sender: TObject);
     procedure TimerAutoUpdateTimer(Sender: TObject);
+    procedure ToggleSwitchForceToDateFunctionClick(Sender: TObject);
     procedure ToggleSwitchHighlightErrorsClick(Sender: TObject);
-    procedure ToggleSwitchIgnoreBasicLogClick(Sender: TObject);
+    procedure ToggleSwitchIgnoreServerDMLogClick(Sender: TObject);
     procedure ToggleSwitchRowSelectClick(Sender: TObject);
     procedure ToggleSwitchShowBottomPanelClick(Sender: TObject);
     procedure ToggleSwitchShowLineNumbersClick(Sender: TObject);
     procedure ToggleSwitchShowOnlySQLClick(Sender: TObject);
     procedure ToggleSwitchStartMaximizedClick(Sender: TObject);
     procedure ToggleSwitchStayOnTopClick(Sender: TObject);
-    procedure ToggleSwitchForceToDateFunctionClick(Sender: TObject);
-    procedure FDMemTableFilterTypeSetText(Sender: TField; const Text: string);
-    procedure FDMemTableFilterErrorSetText(Sender: TField; const Text: string);
-    procedure LabelURLClick(Sender: TObject);
-    procedure LabelShowOnlySQLInfoClick(Sender: TObject);
-    procedure RadioGroupStylesClick(Sender: TObject);
-    procedure ActionOpenLastExecute(Sender: TObject);
-    procedure MenuItemCopyMethodNameClick(Sender: TObject);
-    procedure TabSheetSQLShow(Sender: TObject);
-    procedure ComboBoxDateFormatChange(Sender: TObject);
+    procedure ActionClearCacheExecute(Sender: TObject);
   private
     // grid sync
     FGridWindowProc: Pointer;
@@ -194,6 +198,7 @@ type
     procedure ClearFilters;
     procedure CopyColumnValue;
     procedure CopyMethodName;
+    procedure DeleteFolder(const aFolderName: string);
     procedure GetMostRecentLog;
     procedure LoadLineDetails;
     procedure LoadLastDirectory(aOptions: TOptions);
@@ -284,6 +289,14 @@ begin
   FDMemTableFilter.BeforeInsert := OnBeforeInsertAbort;
 end;
 
+procedure TfMonitor.ActionClearCacheExecute(Sender: TObject);
+begin
+  DeleteFolder('Cache');
+  DeleteFolder('cfgs');
+  DeleteFolder('cfgs_srv');
+  DeleteFolder('cfgs_usr');
+end;
+
 procedure TfMonitor.ActionClearLogExecute(Sender: TObject);
 begin
   LogViewer.EmptyDataSet;
@@ -302,6 +315,7 @@ procedure TfMonitor.BuildFilter;
 var
   lBuilderFilter: TStringBuilder;
   lField: TField;
+  lBookMark: TBookMark;
 
   function GetFilterString(const aFilter: string): string;
   begin
@@ -309,6 +323,8 @@ var
   end;
 
 begin
+  lBookMark := LogViewer.GetBookMark;
+
   if FDMemTableFilter.State in dsEditModes then
     FDMemTableFilter.Post;
 
@@ -335,6 +351,9 @@ begin
     LogViewer.SetLogFilter(lBuilderFilter.ToString);
   finally
     lBuilderFilter.Free;
+
+    if LogViewer.BookmarkValid(lBookMark) then
+      LogViewer.GotoBookmark(lBookMark);
   end;
 end;
 
@@ -409,7 +428,8 @@ end;
 procedure TfMonitor.LabelIgnoreBasicLogInfoClick(Sender: TObject);
 begin
   ShowInfoMessage(
-    'Ignora os métodos da classe TfpgServidorDM, como "Login", "LoginInterno" e "AutenticarUsuario".');
+    'Ignora os métodos da classe TfpgServidorDM e TfsgServidorDM,' + sLineBreak +
+    'como "Login", "LoginInterno" e "AutenticarUsuario".');
 end;
 
 procedure TfMonitor.LabelRowSelectInfoClick(Sender: TObject);
@@ -516,7 +536,7 @@ begin
   ToggleSwitchShowOnlySQL.Active := aOptions.ReadEnabled(sSHOW_ONLY_SQL);
   ToggleSwitchHighlightErrors.Active := aOptions.ReadEnabled(sHIGHLIGHT_ERRORS);
   ToggleSwitchShowBottomPanel.Active := aOptions.ReadEnabled(sSHOW_BOTTOM_PANEL);
-  ToggleSwitchIgnoreBasicLog.Active := aOptions.ReadEnabled(sIGNORE_BASIC_LOG);
+  ToggleSwitchIgnoreServerDMLog.Active := aOptions.ReadEnabled(sIGNORE_BASIC_LOG);
   ToggleSwitchRowSelect.Active := aOptions.ReadEnabled(sROW_SELECT);
   ToggleSwitchStayOnTop.Active := aOptions.ReadEnabled(sSTAY_ON_TOP);
   ToggleSwitchShowLineNumbers.Active := aOptions.ReadEnabled(sSHOW_LINE_NUMBERS);
@@ -685,6 +705,14 @@ begin
     DBGridFilter.EditorMode := True;
 end;
 
+procedure TfMonitor.DBGridFilterColResize(Sender: TObject);
+var
+  Counter: integer;
+begin
+  for Counter := 0 to Pred(DBGridFilter.Columns.Count) do
+    DBGrid.Columns[Counter].Width := DBGridFilter.Columns[Counter].Width;
+end;
+
 procedure TfMonitor.DBGridFilterColumnMoved(Sender: TObject; FromIndex,
   ToIndex: Integer);
 var
@@ -713,6 +741,18 @@ begin
     Key := #0;
     OpenSQLTab;
   end;
+end;
+
+procedure TfMonitor.DeleteFolder(const aFolderName: string);
+var
+  lCurrentPath: string;
+  lCacheFolder: string;
+  lCommand: string;
+begin
+  lCurrentPath := ExtractFilePath(FCurrentFile);
+  lCacheFolder := Format('%s%s', [lCurrentPath, aFolderName]);
+  lCommand := Format('cmd.exe /c rmdir /s /q %s', [lCacheFolder]);
+  WinExec(PAnsiChar(ansistring(lCommand)), 0);
 end;
 
 procedure TfMonitor.EditSQLFilterKeyPress(Sender: TObject; var Key: Char);
@@ -966,13 +1006,13 @@ begin
   AssignGridDrawEvent;
 end;
 
-procedure TfMonitor.ToggleSwitchIgnoreBasicLogClick(Sender: TObject);
+procedure TfMonitor.ToggleSwitchIgnoreServerDMLogClick(Sender: TObject);
 var
   lEnable: boolean;
 begin
-  lEnable := ToggleSwitchIgnoreBasicLog.IsOn;
+  lEnable := ToggleSwitchIgnoreServerDMLog.IsOn;
   SaveOption(sIGNORE_BASIC_LOG, lEnable.ToString);
-  LogViewer.IgnoreBasicLog := lEnable;
+  LogViewer.IgnoreServerDMLog := lEnable;
 
   if FCurrentFile.Trim.IsEmpty then
     Exit;

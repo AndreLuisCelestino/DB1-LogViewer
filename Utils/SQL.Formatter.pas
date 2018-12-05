@@ -452,6 +452,10 @@ begin
 
       Inc(FSameLinePosition, Succ(lValue.Length));
 
+      // to deal with ROW_NUMBER command
+      if lValue.Contains('ORDER_BY') then
+        lValue := lValue.Replace('_', sSPACE, [rfReplaceAll]);
+
       lBuilder.Append(lValue).Append(sSPACE);
 
       if BreakLineNeeded(lValue) then

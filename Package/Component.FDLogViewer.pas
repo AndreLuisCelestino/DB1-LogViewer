@@ -14,7 +14,7 @@ type
     FStringListFile: TStringList;
     FStringListLine: TStringList;
     FShowOnlySQL: boolean;
-    FIgnoreBasicLog: boolean;
+    FIgnoreServerDMLog: boolean;
 
     // DataSet Fields
     FFieldType: TField;
@@ -44,6 +44,7 @@ type
     destructor Destroy; override;
 
     // public functions
+    function IsServerDMClass(const aClassName: string): boolean;
     function IsErrorLine: boolean;
     function IsSQLEmpty: boolean;
     function CopyValue(const aField: string): string;
@@ -60,7 +61,7 @@ type
     // properties
     property LogFileName: string read FLogFileName write FLogFileName;
     property ShowOnlySQL: boolean read FShowOnlySQL write FShowOnlySQL;
-    property IgnoreBasicLog: boolean read FIgnoreBasicLog write FIgnoreBasicLog;
+    property IgnoreServerDMLog: boolean read FIgnoreServerDMLog write FIgnoreServerDMLog;
   end;
 
 procedure Register;
@@ -214,6 +215,11 @@ begin
   FStringListLine.StrictDelimiter := True;
 end;
 
+function TFDLogViewer.IsServerDMClass(const aClassName: string): boolean;
+begin
+  result := aClassName.Contains('TFPGSERVIDORDM') or aClassName.Contains('TFSGSERVIDORDM');
+end;
+
 function TFDLogViewer.IsErrorLine: boolean;
 begin
   result := FFieldError.AsString = 'S';
@@ -260,7 +266,7 @@ begin
       if FShowOnlySQL and (not GetType.Equals('SQL')) then
         Continue;
 
-      if FIgnoreBasicLog and (GetClass.ToUpper.Equals('TFPGSERVIDORDM')) then
+      if FIgnoreServerDMLog and IsServerDMClass(GetClass.ToUpper) then
         Continue;
 
       AppendLineToDataSet;
