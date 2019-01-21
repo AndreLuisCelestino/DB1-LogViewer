@@ -38,7 +38,7 @@ type
     procedure CreateInternalObjects;
     procedure DestroyInternalObjects;
     procedure DecMargin(const aQtde: byte);
-    procedure ExtractParamsList(const aSQL: string; const aParamsPosition: smallint);
+    procedure ExtractParamsList(const aSQL: string; const aParamsPosition: integer);
     procedure InitializeStringLists;
 
     // SQL processing
@@ -123,7 +123,7 @@ end;
 
 function TSQLFormatter.ProcessParameters(const aSQL: string): string;
 var
-  lParamsPosition: smallint;
+  lParamsPosition: integer;
 begin
   result := aSQL;
   lParamsPosition := Pos('PARAMS=', aSQL.ToUpper);
@@ -502,13 +502,13 @@ begin
   result := result.Replace('_', sSPACE, [rfReplaceAll]);
 end;
 
-procedure TSQLFormatter.ExtractParamsList(const aSQL: string; const aParamsPosition: smallint);
+procedure TSQLFormatter.ExtractParamsList(const aSQL: string; const aParamsPosition: integer);
 var
   lParamsSection: string;
   lParam: string;
-  lOffSet: smallint;
-  lStartPosition: smallint;
-  lEndPosition: smallint;
+  lOffSet: integer;
+  lStartPosition: integer;
+  lEndPosition: integer;
 begin
   lParamsSection := Copy(aSQL, aParamsPosition, Length(aSQL) - aParamsPosition + 1);
 

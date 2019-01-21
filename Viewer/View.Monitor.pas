@@ -200,7 +200,7 @@ type
     procedure CopyMethodName;
     procedure DeleteFolder(const aFolderName: string);
     procedure GetMostRecentLog;
-    procedure LoadLineDetails;
+    procedure LoadRecordDetails;
     procedure LoadLastDirectory(aOptions: TOptions);
     procedure LoadLog;
     procedure LoadLogOnTimer;
@@ -344,7 +344,7 @@ begin
 
     if not Trim(EditSQLFilter.Text).IsEmpty then
     begin
-      lBuilderFilter.Append(Format(' and Type = ''SQL'' and SQL like %s',
+      lBuilderFilter.Append(Format(' and SQL like %s',
         [GetFilterString(EditSQLFilter.Text)]));
     end;
 
@@ -467,7 +467,7 @@ begin
     FLastDirectory := sDEFAULT_DIRECTORY;
 end;
 
-procedure TfMonitor.LoadLineDetails;
+procedure TfMonitor.LoadRecordDetails;
 begin
   LabeledEditDatabase.Text := LogViewer.FieldByName('Database').AsString;
   LabeledEditUser.Text := LogViewer.FieldByName('User').AsString;
@@ -489,6 +489,7 @@ begin
 
   TimerAutoUpdate.Enabled := False;
   LogViewer.EmptyDataSet;
+  SynMemoSQL.Lines.Clear;
 
   fLoading := TfLoading.Create(nil);
   try
@@ -574,8 +575,12 @@ begin
   if LogViewer.IsSQLEmpty then
   Exit;
 
-  SynMemoTab.Lines.Text := FSQLFormatter.FormatSQL(LogViewer.GetSQL);
-  LoadLineDetails;
+  try
+    SynMemoTab.Lines.Text := FSQLFormatter.FormatSQL(LogViewer.GetSQL);
+    LoadRecordDetails;
+  except
+    MessageDlg('A SQL possui algum erro de sintaxe :(', mtWarning, [mbOK], 0);
+  end;
 end;
 
 procedure TfMonitor.LoadPickLists;

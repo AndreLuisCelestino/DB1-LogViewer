@@ -1,7 +1,7 @@
 object fMonitor: TfMonitor
   Left = 488
   Top = 0
-  Caption = 'DB1 LogViewer 1.8'
+  Caption = 'DB1 LogViewer 1.9'
   ClientHeight = 629
   ClientWidth = 1344
   Color = clBtnFace
@@ -146,7 +146,7 @@ object fMonitor: TfMonitor
               Expanded = False
               FieldName = 'Database'
               Title.Caption = 'Base'
-              Width = 70
+              Width = 80
               Visible = True
             end
             item
@@ -229,7 +229,7 @@ object fMonitor: TfMonitor
                 Expanded = False
                 FieldName = 'Database'
                 Title.Caption = 'Base'
-                Width = 70
+                Width = 80
                 Visible = True
               end
               item
