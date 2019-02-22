@@ -17,6 +17,7 @@ type
     FIgnoreServerDMLog: boolean;
 
     // DataSet Fields
+    FFieldLine: TField;
     FFieldType: TField;
     FFieldDatabase: TField;
     FFieldUser: TField;
@@ -34,7 +35,7 @@ type
     function GetClass: string;
 
     // private procedures
-    procedure AppendLineToDataSet;
+    procedure AppendLineToDataSet(const aCounter: integer);
     procedure AssignFields;
     procedure DefineFields;
     procedure LoadFile;
@@ -66,21 +67,10 @@ type
 
 procedure Register;
 
-const
-  POSITION_TYPE = 5;
-  POSITION_DATABASE = 6;
-  POSITION_USER = 9;
-  POSITION_IP = 10;
-  POSITION_DATE = 11;
-  POSITION_TIME = 12;
-  POSITION_CLASS = 13;
-  POSITION_METHOD = 14;
-  POSITION_SQL = 15;
-
 implementation
 
 uses
-  Dialogs;
+  Dialogs, Utils.Constants;
 
 procedure Register;
 begin
@@ -89,11 +79,12 @@ end;
 
 { TFDLogViewer }
 
-procedure TFDLogViewer.AppendLineToDataSet;
+procedure TFDLogViewer.AppendLineToDataSet(const aCounter: integer);
 var
   lCounter: integer;
 begin
   Self.Append;
+  FFieldLine.AsInteger := aCounter;
   FFieldType.AsString := FStringListLine[POSITION_TYPE];
   FFieldDatabase.AsString := FStringListLine[POSITION_DATABASE];
   FFieldUser.AsString := FStringListLine[POSITION_USER];
@@ -114,6 +105,7 @@ end;
 
 procedure TFDLogViewer.AssignFields;
 begin
+  FFieldLine := Self.FieldByName('Line');
   FFieldType := Self.FieldByName('Type');
   FFieldDatabase := Self.FieldByName('Database');
   FFieldUser := Self.FieldByName('User');
@@ -143,6 +135,7 @@ procedure TFDLogViewer.DefineFields;
 begin
   with Self.FieldDefs do
   begin
+    Add('Line', ftInteger);
     Add('Type', ftString, 10);
     Add('Database', ftString, 20);
     Add('User', ftString, 50);
@@ -269,7 +262,7 @@ begin
       if FIgnoreServerDMLog and IsServerDMClass(GetClass.ToUpper) then
         Continue;
 
-      AppendLineToDataSet;
+      AppendLineToDataSet(lCounter);
     end;
   finally
     Self.AfterScroll := lOriginalAfterScroll;

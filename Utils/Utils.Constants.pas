@@ -3,6 +3,7 @@ unit Utils.Constants;
 interface
 
 const
+  // preferences
   sAUTO_UPDATE_ENABLED = 'AutoUpdateEnabled';
   sSHOW_ONLY_SQL = 'ShowOnlySQL';
   sHIGHLIGHT_ERRORS = 'HighlightErrors';
@@ -16,6 +17,7 @@ const
   sDATE_FORMAT = 'DateFormat';
   sDEFAULT_DATE_FORMAT = 'dd/mm/yyyy';
 
+  // initialization params
   sLAST_DIRECTORY = 'LastDirectory';
   sDEFAULT_DIRECTORY = 'Q:\bin\';
   sDEFAULT_STYLE = 'Windows';
@@ -27,13 +29,24 @@ const
   nLEFT = 'Left';
   nTOP = 'Top';
 
+  // values constants
   sSPACE = ' ';
   sDOUBLE_SPACE = '  ';
   sSUBSELECT = '(SELECT';
-  nTYPE_COLUMN = 0;
+  nTYPE_COLUMN = 1;
   nERROR_COLUMN = 7;
   nMARGIN = 2;
 
+  // log data positions
+  POSITION_TYPE = 5;
+  POSITION_DATABASE = 6;
+  POSITION_USER = 9;
+  POSITION_IP = 10;
+  POSITION_DATE = 11;
+  POSITION_TIME = 12;
+  POSITION_CLASS = 13;
+  POSITION_METHOD = 14;
+  POSITION_SQL = 15;
 
 implementation
 

@@ -120,6 +120,9 @@ type
     ToggleSwitchShowOnlySQL: TToggleSwitch;
     ToggleSwitchStartMaximized: TToggleSwitch;
     ToggleSwitchStayOnTop: TToggleSwitch;
+    FDMemTableFilterLine: TIntegerField;
+    MenuItemSeparator: TMenuItem;
+    ExportarDados1: TMenuItem;
     procedure ActionClearLogExecute(Sender: TObject);
     procedure ActionOpenFileExecute(Sender: TObject);
     procedure ActionOpenLastExecute(Sender: TObject);

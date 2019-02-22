@@ -137,6 +137,12 @@ object fMonitor: TfMonitor
           Columns = <
             item
               Expanded = False
+              FieldName = 'Line'
+              Width = 50
+              Visible = True
+            end
+            item
+              Expanded = False
               FieldName = 'Type'
               Title.Caption = 'Tipo'
               Width = 70
@@ -146,7 +152,7 @@ object fMonitor: TfMonitor
               Expanded = False
               FieldName = 'Database'
               Title.Caption = 'Base'
-              Width = 80
+              Width = 85
               Visible = True
             end
             item
@@ -159,7 +165,7 @@ object fMonitor: TfMonitor
             item
               Expanded = False
               FieldName = 'IP'
-              Width = 110
+              Width = 105
               Visible = True
             end
             item
@@ -220,6 +226,13 @@ object fMonitor: TfMonitor
             Columns = <
               item
                 Expanded = False
+                FieldName = 'Line'
+                Title.Caption = 'Linha'
+                Width = 50
+                Visible = True
+              end
+              item
+                Expanded = False
                 FieldName = 'Type'
                 Title.Caption = 'Tipo'
                 Width = 70
@@ -229,7 +242,7 @@ object fMonitor: TfMonitor
                 Expanded = False
                 FieldName = 'Database'
                 Title.Caption = 'Base'
-                Width = 80
+                Width = 85
                 Visible = True
               end
               item
@@ -242,7 +255,7 @@ object fMonitor: TfMonitor
               item
                 Expanded = False
                 FieldName = 'IP'
-                Width = 110
+                Width = 105
                 Visible = True
               end
               item
@@ -1050,6 +1063,12 @@ object fMonitor: TfMonitor
       Caption = 'Copiar Coluna'
       ShortCut = 16465
       OnClick = MenuItemCopyColumnValueClick
+    end
+    object MenuItemSeparator: TMenuItem
+      Caption = '-'
+    end
+    object ExportarDados1: TMenuItem
+      Caption = 'Exportar Dados'
     end
   end
   object ImageList: TImageList
@@ -2287,6 +2306,9 @@ object fMonitor: TfMonitor
     StoreDefs = True
     Left = 41
     Top = 402
+    object FDMemTableFilterLine: TIntegerField
+      FieldName = 'Line'
+    end
     object FDMemTableFilterType: TStringField
       FieldName = 'Type'
       OnSetText = FDMemTableFilterTypeSetText

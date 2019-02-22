@@ -27,6 +27,8 @@ type
     function ExtractCommand(const aSQL: string): string;
     function ExtractSubSelect(const aSQL: string): string;
     function FormatDateTimeWithToDateFunction(const aDateTime: TDateTime): string;
+    function GetFormattedDate(const aValue: string): string;
+    function GetQuotedValue(const aValue: string): string;
     function IdentSQL(const aPreparedSQL: string): string;
     function IsCommand(const aValue: string): boolean;
     function PrepareSQL(const aSQL: string): string;
@@ -267,8 +269,18 @@ var
   lCounter: smallint;
 
   function IsDateTimeParameter: boolean;
+  var
+    lIsNull: boolean;
+    lIsDate: boolean;
   begin
-    result := (lType = 'FTDATETIME') or (lType = 'FTDATE');
+    lIsNull := lValue.ToLower.Equals('null');
+    lIsDate := (lType = 'FTDATETIME') or (lType = 'FTDATE');
+    result := (not lIsNull) and (lIsDate);
+  end;
+
+  function IsStringParameter: boolean;
+  begin
+      result := (lType.ToUpper.Equals('FTSTRING')) or (lType.ToUpper.Equals('FTWIDESTRING'));
   end;
 
 begin
@@ -290,14 +302,10 @@ begin
     end;
 
     if IsDateTimeParameter then
-    begin
-      lDate := StrToDateTime(lValue);
+      lValue := GetFormattedDate(lValue);
 
-      if FUseToDateFunction then
-        lValue := FormatDateTimeWithToDateFunction(lDate)
-      else
-        lValue := QuotedStr(FormatDateTime(FDateFormat + ' hh:nn:ss', lDate));
-    end;
+    if IsStringParameter then
+      lValue := GetQuotedValue(lValue);
 
     result := ReplaceAllStrings(result, lName, lValue);
   end;
@@ -385,6 +393,23 @@ begin
   lPreparedSQL := ProcessParameters(aSQL);
   lPreparedSQL := PrepareSQL(lPreparedSQL);
   result := IdentSQL(lPreparedSQL);
+end;
+
+function TSQLFormatter.GetFormattedDate(const aValue: string): string;
+var
+  lDate: TDateTime;
+begin
+  lDate := StrToDateTime(aValue);
+
+  if FUseToDateFunction then
+    result := FormatDateTimeWithToDateFunction(lDate)
+  else
+    result := QuotedStr(FormatDateTime(FDateFormat + ' hh:nn:ss', lDate));
+end;
+
+function TSQLFormatter.GetQuotedValue(const aValue: string): string;
+begin
+  result := aValue.DeQuotedString.QuotedString;
 end;
 
 function TSQLFormatter.IdentSQL(const aPreparedSQL: string): string;
@@ -517,7 +542,10 @@ begin
   while Pos('[', lParamsSection, lOffSet) > 0 do
   begin
     lStartPosition := Pos('[', lParamsSection, lOffSet);
-    lEndPosition := Pos(']', lParamsSection, lOffSet);
+    lEndPosition := Pos('][', lParamsSection, lOffSet);
+
+    if lEndPosition = 0 then
+      lEndPosition := Pos('])', lParamsSection, lOffSet);
 
     lParam := Copy(lParamsSection, Succ(lStartPosition), Pred(lEndPosition - lStartPosition));
     FStringListParameters.Add(lParam);
