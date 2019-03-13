@@ -9,7 +9,9 @@ uses
 type
   TfLoading = class(TForm)
     PanelLoading: TPanel;
-    LabelLoading: TLabel;
+    LabelMessage: TLabel;
+  public
+    procedure ShowUpdateMessage;
   end;
 
 var
@@ -18,5 +20,14 @@ var
 implementation
 
 {$R *.dfm}
+
+{ TfLoading }
+
+procedure TfLoading.ShowUpdateMessage;
+begin
+  LabelMessage.Caption := 'Atualizando...';
+  Self.Show;
+  Application.ProcessMessages;
+end;
 
 end.

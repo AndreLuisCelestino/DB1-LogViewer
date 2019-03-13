@@ -1,7 +1,7 @@
 object fMonitor: TfMonitor
   Left = 488
   Top = 0
-  Caption = 'DB1 LogViewer 1.9'
+  Caption = 'DB1 LogViewer 2.0'
   ClientHeight = 629
   ClientWidth = 1344
   Color = clBtnFace
@@ -50,6 +50,24 @@ object fMonitor: TfMonitor
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 1
+        object LabelNewVersionAvailable: TLabel
+          Left = 800
+          Top = 16
+          Width = 185
+          Height = 38
+          Cursor = crHandPoint
+          Alignment = taCenter
+          AutoSize = False
+          Caption = 'Nova vers'#227'o dispon'#237'vel!'#13#10'Clique para atualizar.'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clHighlight
+          Font.Height = -13
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          Visible = False
+          OnClick = LabelNewVersionAvailableClick
+        end
         object ActionToolBar: TActionToolBar
           Left = 0
           Top = 0
@@ -132,7 +150,9 @@ object fMonitor: TfMonitor
           TitleFont.Height = -11
           TitleFont.Name = 'Tahoma'
           TitleFont.Style = []
+          OnDrawColumnCell = DBGridDrawColumnCell
           OnDblClick = DBGridDblClick
+          OnKeyDown = DBGridKeyDown
           OnKeyPress = DBGridKeyPress
           Columns = <
             item
@@ -1069,6 +1089,7 @@ object fMonitor: TfMonitor
     end
     object ExportarDados1: TMenuItem
       Caption = 'Exportar Dados'
+      Visible = False
     end
   end
   object ImageList: TImageList

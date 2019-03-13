@@ -123,12 +123,16 @@ type
     FDMemTableFilterLine: TIntegerField;
     MenuItemSeparator: TMenuItem;
     ExportarDados1: TMenuItem;
+    LabelNewVersionAvailable: TLabel;
+    procedure ActionClearCacheExecute(Sender: TObject);
     procedure ActionClearLogExecute(Sender: TObject);
     procedure ActionOpenFileExecute(Sender: TObject);
     procedure ActionOpenLastExecute(Sender: TObject);
     procedure ActionReloadLogExecute(Sender: TObject);
     procedure CheckBoxAutoUpdateClick(Sender: TObject);
     procedure ComboBoxDateFormatChange(Sender: TObject);
+    procedure DBGridDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer;
+      Column: TColumn; State: TGridDrawState);
     procedure DBGridDblClick(Sender: TObject);
     procedure DBGridFilterColEnter(Sender: TObject);
     procedure DBGridFilterColResize(Sender: TObject);
@@ -167,7 +171,8 @@ type
     procedure ToggleSwitchShowOnlySQLClick(Sender: TObject);
     procedure ToggleSwitchStartMaximizedClick(Sender: TObject);
     procedure ToggleSwitchStayOnTopClick(Sender: TObject);
-    procedure ActionClearCacheExecute(Sender: TObject);
+    procedure DBGridKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure LabelNewVersionAvailableClick(Sender: TObject);
   private
     // grid sync
     FGridWindowProc: Pointer;
@@ -179,10 +184,19 @@ type
     FLastDirectory: string;
     FCurrentFile: string;
 
+    FHighlightErrorsEvent: TDrawColumnCellEvent;
+    FHighlightBookmarkEvent: TDrawColumnCellEvent;
+
     // event handlers
-    procedure OnDrawColumnCellHighlight(Sender: TObject; const Rect: TRect; DataCol: Integer;
+    procedure OnDrawColumnCellHighlightError(Sender: TObject; const Rect: TRect; DataCol: Integer;
+      Column: TColumn; State: TGridDrawState);
+    procedure OnDrawColumnCellHighlightBookmark(Sender: TObject; const Rect: TRect; DataCol: Integer;
       Column: TColumn; State: TGridDrawState);
     procedure OnBeforeInsertAbort(DataSet: TDataSet);
+
+    // grid sync
+    procedure GetGridWindowProcData;
+    procedure GridCustomWindowProc(var Msg: TMessage);
 
     // private functions
     function IsFileNameValid: boolean;
@@ -190,15 +204,12 @@ type
     function OpenFile: string;
     function ExtractDateTimeFromFileName: string;
 
-    // grid sync
-    procedure GetGridWindowProcData;
-    procedure GridCustomWindowProc(var Msg: TMessage);
-
     // private procedures
     procedure AddFilterEmptyLine;
     procedure AssignGridDrawEvent;
     procedure BuildFilter;
     procedure ClearFilters;
+    procedure CheckForNewVersion;
     procedure CopyColumnValue;
     procedure CopyMethodName;
     procedure DeleteFolder(const aFolderName: string);
@@ -218,6 +229,7 @@ type
     procedure ManageTimer;
     procedure OpenSQLTab;
     procedure SaveOption(const aKey: string; const aValue: string);
+    procedure SetBookmark;
     procedure ShowInfoMessage(const aMessage: string);
     procedure ShowRecordInfo;
   end;
@@ -229,7 +241,7 @@ implementation
 
 uses
   VCL.Themes, ShellAPI, ClipBrd, Utils.Constants, Utils.Helpers, View.Loading,
-  System.UITypes, StrUtils;
+  System.UITypes, StrUtils, Utils.Updater, System.Threading;
 
 {$R *.dfm}
 
@@ -309,16 +321,18 @@ end;
 
 procedure TfMonitor.AssignGridDrawEvent;
 begin
-  DBGrid.OnDrawColumnCell := nil;
+  FHighlightBookmarkEvent := OnDrawColumnCellHighlightBookmark;
+
+  FHighlightErrorsEvent := nil;
   if ToggleSwitchHighlightErrors.IsOn then
-    DBGrid.OnDrawColumnCell := OnDrawColumnCellHighlight;
+    FHighlightErrorsEvent := OnDrawColumnCellHighlightError;
 end;
 
 procedure TfMonitor.BuildFilter;
 var
   lBuilderFilter: TStringBuilder;
   lField: TField;
-  lBookMark: TBookMark;
+  lBookmark: TBookmark;
 
   function GetFilterString(const aFilter: string): string;
   begin
@@ -326,7 +340,7 @@ var
   end;
 
 begin
-  lBookMark := LogViewer.GetBookMark;
+  lBookmark := LogViewer.GetBookmark;
 
   if FDMemTableFilter.State in dsEditModes then
     FDMemTableFilter.Post;
@@ -355,8 +369,8 @@ begin
   finally
     lBuilderFilter.Free;
 
-    if LogViewer.BookmarkValid(lBookMark) then
-      LogViewer.GotoBookmark(lBookMark);
+    if LogViewer.BookmarkValid(lBookmark) then
+      LogViewer.GotoBookmark(lBookmark);
   end;
 end;
 
@@ -433,6 +447,18 @@ begin
   ShowInfoMessage(
     'Ignora os métodos da classe TfpgServidorDM e TfsgServidorDM,' + sLineBreak +
     'como "Login", "LoginInterno" e "AutenticarUsuario".');
+end;
+
+procedure TfMonitor.LabelNewVersionAvailableClick(Sender: TObject);
+var
+  lUpdater: TUpdater;
+begin
+  lUpdater := TUpdater.Create;
+  try
+    lUpdater.UpdateApplication;
+  finally
+    lUpdater.Free;
+  end;
 end;
 
 procedure TfMonitor.LabelRowSelectInfoClick(Sender: TObject);
@@ -647,6 +673,22 @@ begin
   SaveOption(sAUTO_UPDATE_ENABLED, lEnable.ToString);
 end;
 
+procedure TfMonitor.CheckForNewVersion;
+var
+  Task : ITask;
+begin
+  Task := TTask.Create(
+    procedure
+    var
+      lUpdater: TUpdater;
+    begin
+      lUpdater := TUpdater.Create;
+      LabelNewVersionAvailable.Visible := lUpdater.CheckForNewVersion;
+      lUpdater.Free;
+    end);
+  Task.Start;
+end;
+
 procedure TfMonitor.ClearFilters;
 var
   lField: TField;
@@ -704,6 +746,16 @@ begin
   OpenSQLTab;
 end;
 
+procedure TfMonitor.DBGridDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer;
+  Column: TColumn; State: TGridDrawState);
+begin
+  if Assigned(FHighlightErrorsEvent) then
+    FHighlightErrorsEvent(Sender, Rect, DataCol, Column, State);
+
+  If Assigned(FHighlightBookmarkEvent) then
+    FHighlightBookmarkEvent(Sender, Rect, DataCol, Column, State);
+end;
+
 procedure TfMonitor.DBGridFilterColEnter(Sender: TObject);
 var
   lFieldName: string;
@@ -740,6 +792,15 @@ begin
     Key := #0;
     BuildFilter;
   end;
+end;
+
+procedure TfMonitor.DBGridKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if (Shift = [ssCtrl, ssShift]) and (Key = 49) then
+    SetBookmark;
+
+  if (Shift = [ssCtrl]) and (Key = 49) then
+    LogViewer.UseBookMark;
 end;
 
 procedure TfMonitor.DBGridKeyPress(Sender: TObject; var Key: Char);
@@ -807,13 +868,26 @@ begin
   Abort;
 end;
 
-procedure TfMonitor.OnDrawColumnCellHighlight(Sender: TObject; const Rect: TRect; DataCol: Integer;
+procedure TfMonitor.OnDrawColumnCellHighlightError(Sender: TObject; const Rect: TRect; DataCol: Integer;
   Column: TColumn; State: TGridDrawState);
 begin
   if LogViewer.IsErrorLine then
   begin
     DBGrid.Canvas.Brush.Color := $00B9B9FF;
     DBGrid.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+  end;
+end;
+
+procedure TfMonitor.OnDrawColumnCellHighlightBookmark(Sender: TObject; const Rect: TRect;
+  DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  if Column.FieldName.ToUpper.Equals('LINE') then
+  begin
+    if LogViewer.IsBookmarkedLine then
+    begin
+      DBGrid.Canvas.Brush.Color := clMoneyGreen;
+      DBGrid.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+    end;
   end;
 end;
 
@@ -953,6 +1027,7 @@ end;
 procedure TfMonitor.FormShow(Sender: TObject);
 begin
   GetMostRecentLog;
+  CheckForNewVersion;
 end;
 
 procedure TfMonitor.SaveOption(const aKey: string; const aValue: string);
@@ -968,6 +1043,12 @@ begin
   finally
     lOptions.Free;
   end;
+end;
+
+procedure TfMonitor.SetBookmark;
+begin
+  LogViewer.SetBookmark;
+  DBGrid.Refresh;
 end;
 
 procedure TfMonitor.LogViewerAfterScroll(DataSet: TDataSet);

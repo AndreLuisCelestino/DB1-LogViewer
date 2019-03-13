@@ -112,9 +112,10 @@
         <AppEnableHighDPI>true</AppEnableHighDPI>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Icon_MainIcon>LogViewer.ico</Icon_MainIcon>
-        <VerInfo_Keys>CompanyName=DB1 Global Software;FileDescription=$(MSBuildProjectName);FileVersion=1.9.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=DB1 Global Software;FileDescription=$(MSBuildProjectName);FileVersion=2.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <DCC_UnitSearchPath>..\3rdParty\SynEdit\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-        <VerInfo_MinorVer>9</VerInfo_MinorVer>
+        <VerInfo_MinorVer>0</VerInfo_MinorVer>
+        <VerInfo_MajorVer>2</VerInfo_MajorVer>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -131,6 +132,7 @@
         <DCCReference Include="..\Utils\Utils.Helpers.pas"/>
         <DCCReference Include="..\Utils\Utils.Constants.pas"/>
         <DCCReference Include="..\Utils\SQL.Formatter.pas"/>
+        <DCCReference Include="..\Utils\Utils.Updater.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

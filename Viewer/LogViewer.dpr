@@ -9,7 +9,8 @@ uses
   Utils.Options in '..\Utils\Utils.Options.pas',
   Utils.Helpers in '..\Utils\Utils.Helpers.pas',
   Utils.Constants in '..\Utils\Utils.Constants.pas',
-  SQL.Formatter in '..\Utils\SQL.Formatter.pas';
+  SQL.Formatter in '..\Utils\SQL.Formatter.pas',
+  Utils.Updater in '..\Utils\Utils.Updater.pas';
 
 {$R *.res}
 

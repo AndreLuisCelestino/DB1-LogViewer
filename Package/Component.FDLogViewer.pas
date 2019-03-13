@@ -15,6 +15,8 @@ type
     FStringListLine: TStringList;
     FShowOnlySQL: boolean;
     FIgnoreServerDMLog: boolean;
+    FBookmark: TBookMark;
+    FBookmarkLine: integer;
 
     // DataSet Fields
     FFieldLine: TField;
@@ -58,6 +60,11 @@ type
     procedure RemoveFilter;
     procedure ResetCounter;
     procedure SetLogFilter(const aFilter: string);
+
+    // bookmark
+    procedure UseBookmark;
+    procedure SetBookmark;
+    function IsBookmarkedLine: boolean;
 
     // properties
     property LogFileName: string read FLogFileName write FLogFileName;
@@ -193,6 +200,12 @@ begin
   result := FStringListLine[POSITION_TYPE];
 end;
 
+procedure TFDLogViewer.UseBookmark;
+begin
+  if Self.BookmarkValid(FBookmark) then
+    Self.GotoBookmark(FBookmark);
+end;
+
 procedure TFDLogViewer.Initialize;
 begin
   FStringListFile := TStringList.Create;
@@ -203,6 +216,7 @@ begin
   Self.FLogFileName := EmptyStr;
   Self.Filter := '(1 = 1)';
   Self.Filtered := True;
+  Self.FBookmarkLine := -1;
 
   FStringListLine.Delimiter := ';';
   FStringListLine.StrictDelimiter := True;
@@ -211,6 +225,11 @@ end;
 function TFDLogViewer.IsServerDMClass(const aClassName: string): boolean;
 begin
   result := aClassName.Contains('TFPGSERVIDORDM') or aClassName.Contains('TFSGSERVIDORDM');
+end;
+
+function TFDLogViewer.IsBookmarkedLine: boolean;
+begin
+  result := Self.FBookmarkLine = Self.FFieldLine.AsInteger;
 end;
 
 function TFDLogViewer.IsErrorLine: boolean;
@@ -288,6 +307,21 @@ end;
 procedure TFDLogViewer.ResetCounter;
 begin
   FCounter := 0;
+end;
+
+procedure TFDLogViewer.SetBookmark;
+begin
+  if Self.BookmarkValid(FBookmark) then
+    Self.FreeBookmark(FBookmark);
+
+  if IsBookmarkedLine then
+  begin
+    FBookmarkLine := -1;
+    Exit;
+  end;
+
+  FBookmark := Self.GetBookmark;
+  FBookmarkLine := FFieldLine.AsInteger;
 end;
 
 procedure TFDLogViewer.SetLogFilter(const aFilter: string);

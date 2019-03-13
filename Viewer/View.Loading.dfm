@@ -26,11 +26,14 @@ object fLoading: TfLoading
     BevelKind = bkFlat
     BevelOuter = bvNone
     TabOrder = 0
-    object LabelLoading: TLabel
-      Left = 65
-      Top = 10
-      Width = 139
+    object LabelMessage: TLabel
+      Left = 2
+      Top = 11
+      Width = 260
       Height = 32
+      Align = alCustom
+      Alignment = taCenter
+      AutoSize = False
       Caption = 'Carregando...'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText

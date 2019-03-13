@@ -265,7 +265,6 @@ var
   lName: string;
   lType: string;
   lValue: string;
-  lDate: TDateTime;
   lCounter: smallint;
 
   function IsDateTimeParameter: boolean;
