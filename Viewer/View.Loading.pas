@@ -7,15 +7,14 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls;
 
 type
+  TDisplayMessage = (dmLoading, dmUpdating);
+
   TfLoading = class(TForm)
     PanelLoading: TPanel;
     LabelMessage: TLabel;
   public
-    procedure ShowUpdateMessage;
+    constructor Create(const aDisplayMessage: TDisplayMessage); reintroduce;
   end;
-
-var
-  fLoading: TfLoading;
 
 implementation
 
@@ -23,9 +22,18 @@ implementation
 
 { TfLoading }
 
-procedure TfLoading.ShowUpdateMessage;
+constructor TfLoading.Create(const aDisplayMessage: TDisplayMessage);
+var
+  lMessage: string;
 begin
-  LabelMessage.Caption := 'Atualizando...';
+  inherited Create(nil);
+
+  case aDisplayMessage of
+    dmLoading: lMessage := 'Carregando...';
+    dmUpdating: lMessage := 'Atualizando...';
+  end;
+
+  LabelMessage.Caption := lMessage;
   Self.Show;
   Application.ProcessMessages;
 end;

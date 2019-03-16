@@ -1,7 +1,7 @@
 object fMonitor: TfMonitor
   Left = 488
   Top = 0
-  Caption = 'DB1 LogViewer 2.0'
+  Caption = 'DB1 LogViewer 2.1'
   ClientHeight = 629
   ClientWidth = 1344
   Color = clBtnFace
@@ -1084,12 +1084,23 @@ object fMonitor: TfMonitor
       ShortCut = 16465
       OnClick = MenuItemCopyColumnValueClick
     end
-    object MenuItemSeparator: TMenuItem
+    object MenuItemSeparator1: TMenuItem
       Caption = '-'
     end
-    object ExportarDados1: TMenuItem
+    object MenuItemSetBookmark: TMenuItem
+      Caption = 'Marcar Linha'
+      OnClick = MenuItemSetBookmarkClick
+    end
+    object MenuItemGoToBookmark: TMenuItem
+      Caption = 'Ir para Linha Marcada'
+      OnClick = MenuItemGoToBookmarkClick
+    end
+    object MenuItemSeparator2: TMenuItem
+      Caption = '-'
+    end
+    object MenuItemExportData: TMenuItem
       Caption = 'Exportar Dados'
-      Visible = False
+      OnClick = MenuItemExportDataClick
     end
   end
   object ImageList: TImageList

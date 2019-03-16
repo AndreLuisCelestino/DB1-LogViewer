@@ -34,7 +34,7 @@ const
   sDOUBLE_SPACE = '  ';
   sSUBSELECT = '(SELECT';
   nTYPE_COLUMN = 1;
-  nERROR_COLUMN = 7;
+  nERROR_COLUMN = 8;
   nMARGIN = 2;
 
   // log data positions

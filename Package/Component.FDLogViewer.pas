@@ -56,6 +56,7 @@ type
 
     // public procedures
     procedure LoadLog;
+    procedure LoadXMLFile(const aFileName: string);
     procedure ReloadLog;
     procedure RemoveFilter;
     procedure ResetCounter;
@@ -77,7 +78,7 @@ procedure Register;
 implementation
 
 uses
-  Dialogs, Utils.Constants;
+  Utils.Constants;
 
 procedure Register;
 begin
@@ -289,6 +290,20 @@ begin
     Self.Last;
   end;
   FCounter := Pred(FStringListFile.Count);
+end;
+
+procedure TFDLogViewer.LoadXMLFile(const aFileName: string);
+var
+  lDataSet: TFDMemTable;
+begin
+  lDataSet := TFDMemTable.Create(nil);
+  try
+    lDataSet.LoadFromFile(aFileName);
+    Self.CopyDataSet(lDataSet);
+    Self.Last;
+  finally
+    lDataSet.Free;
+  end;
 end;
 
 procedure TFDLogViewer.ReloadLog;

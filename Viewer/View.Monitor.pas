@@ -14,7 +14,7 @@ uses
   FireDAC.Comp.Client, Component.FDLogViewer, Vcl.WinXCtrls, FireDAC.Stan.StorageBin, SynEdit,
   SynMemo, SynEditHighlighter, SynHighlighterSQL, SQL.Formatter, Utils.Options,
   Vcl.DBCtrls, Component.DBGridLog, FireDAC.Phys.Intf, FireDAC.DApt.Intf, System.ImageList,
-  Vcl.ImgList, Vcl.ToolWin;
+  Vcl.ImgList, Vcl.ToolWin, System.Threading;
 
 type
   TfMonitor = class(TForm)
@@ -121,9 +121,12 @@ type
     ToggleSwitchStartMaximized: TToggleSwitch;
     ToggleSwitchStayOnTop: TToggleSwitch;
     FDMemTableFilterLine: TIntegerField;
-    MenuItemSeparator: TMenuItem;
-    ExportarDados1: TMenuItem;
+    MenuItemSeparator2: TMenuItem;
+    MenuItemExportData: TMenuItem;
     LabelNewVersionAvailable: TLabel;
+    MenuItemSeparator1: TMenuItem;
+    MenuItemSetBookmark: TMenuItem;
+    MenuItemGoToBookmark: TMenuItem;
     procedure ActionClearCacheExecute(Sender: TObject);
     procedure ActionClearLogExecute(Sender: TObject);
     procedure ActionOpenFileExecute(Sender: TObject);
@@ -173,6 +176,9 @@ type
     procedure ToggleSwitchStayOnTopClick(Sender: TObject);
     procedure DBGridKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure LabelNewVersionAvailableClick(Sender: TObject);
+    procedure MenuItemSetBookmarkClick(Sender: TObject);
+    procedure MenuItemGoToBookmarkClick(Sender: TObject);
+    procedure MenuItemExportDataClick(Sender: TObject);
   private
     // grid sync
     FGridWindowProc: Pointer;
@@ -199,8 +205,10 @@ type
     procedure GridCustomWindowProc(var Msg: TMessage);
 
     // private functions
+    function GetExportedFileName: string;
     function IsFileNameValid: boolean;
     function IsContentValid: boolean;
+    function IsXMLFile: boolean;
     function OpenFile: string;
     function ExtractDateTimeFromFileName: string;
 
@@ -208,6 +216,7 @@ type
     procedure AddFilterEmptyLine;
     procedure AssignGridDrawEvent;
     procedure BuildFilter;
+    procedure CallUpdateChecking;
     procedure ClearFilters;
     procedure CheckForNewVersion;
     procedure CopyColumnValue;
@@ -241,7 +250,7 @@ implementation
 
 uses
   VCL.Themes, ShellAPI, ClipBrd, Utils.Constants, Utils.Helpers, View.Loading,
-  System.UITypes, StrUtils, Utils.Updater, System.Threading;
+  System.UITypes, StrUtils, Utils.Updater;
 
 {$R *.dfm}
 
@@ -252,7 +261,7 @@ begin
   lOpenDialog := TOpenDialog.Create(nil);
   try
     lOpenDialog.InitialDir := FLastDirectory;
-    lOpenDialog.Filter := 'Log de métodos do servidor|spLogMetodoServidor*.txt|Arquivos TXT|*.txt';
+    lOpenDialog.Filter := 'Log de métodos do servidor|spLogMetodoServidor*.txt|Arquivos TXT|*.txt|Arquivos XML|*.xml';
     lOpenDialog.DefaultExt := 'txt';
 
     if not lOpenDialog.Execute then
@@ -393,6 +402,23 @@ begin
   SaveOption(sSELECTED_STYLE, lStyleName);
 end;
 
+function TfMonitor.GetExportedFileName: string;
+var
+  lSaveDialog: TSaveDialog;
+begin
+  result := EmptyStr;
+  lSaveDialog := TSaveDialog.Create(nil);
+  try
+    lSaveDialog.Filter := 'Arquivo XML|*.xml';
+    lSaveDialog.DefaultExt := 'xml';
+
+    if lSaveDialog.Execute then
+      result := lSaveDialog.FileName;
+  finally
+    lSaveDialog.Free;
+  end;
+end;
+
 procedure TfMonitor.GetGridWindowProcData;
 begin
   FGridWindowProc := MakeObjectInstance(GridCustomWindowProc);
@@ -520,9 +546,14 @@ begin
   LogViewer.EmptyDataSet;
   SynMemoSQL.Lines.Clear;
 
-  fLoading := TfLoading.Create(nil);
+  if IsXMLFile then
+  begin
+    LogViewer.LoadXMLFile(FCurrentFile);
+    Exit;
+  end;
+
+  fLoading := TfLoading.Create(dmLoading);
   try
-    fLoading.Show;
     Application.ProcessMessages;
     LogViewer.LogFileName := FCurrentFile;
     LogViewer.LoadLog;
@@ -662,6 +693,18 @@ begin
     Self.Top := lValue.ToInteger;
 end;
 
+procedure TfMonitor.CallUpdateChecking;
+var
+  lUpdater: TUpdater;
+begin
+  lUpdater := TUpdater.Create;
+  try
+    LabelNewVersionAvailable.Visible := lUpdater.CheckForNewVersion;
+  finally
+    lUpdater.Free;
+  end;
+end;
+
 procedure TfMonitor.CheckBoxAutoUpdateClick(Sender: TObject);
 var
   lEnable: boolean;
@@ -675,17 +718,9 @@ end;
 
 procedure TfMonitor.CheckForNewVersion;
 var
-  Task : ITask;
+  Task: ITask;
 begin
-  Task := TTask.Create(
-    procedure
-    var
-      lUpdater: TUpdater;
-    begin
-      lUpdater := TUpdater.Create;
-      LabelNewVersionAvailable.Visible := lUpdater.CheckForNewVersion;
-      lUpdater.Free;
-    end);
+  Task := TTask.Create(CallUpdateChecking);
   Task.Start;
 end;
 
@@ -923,6 +958,9 @@ var
   lStringListFile: TStringList;
   lStringListLine: TStringList;
 begin
+  if IsXMLFile then
+    Exit(True);
+
   lFileStream := TFileStream.Create(FCurrentFile, fmOpenRead or fmShareDenyNone);
   lStringListFile := TStringList.Create;
   lStringListLine := TStringList.Create;
@@ -961,6 +999,11 @@ begin
     Exit;
 
   result := True;
+end;
+
+function TfMonitor.IsXMLFile: boolean;
+begin
+  result := ExtractFileExt(FCurrentFile).ToUpper.Equals('.XML');
 end;
 
 procedure TfMonitor.FDMemTableFilterErrorSetText(Sender: TField; const Text: string);
@@ -1074,6 +1117,35 @@ procedure TfMonitor.MenuItemCopySQLClick(Sender: TObject);
 begin
   SynMemoTab.Lines.Text := FSQLFormatter.FormatSQL(LogViewer.GetSQL);
   Clipboard.AsText := SynMemoTab.Lines.Text;
+end;
+
+procedure TfMonitor.MenuItemExportDataClick(Sender: TObject);
+var
+  lMemTable: TFDLogViewer;
+  lFileName: string;
+begin
+  lFileName := GetExportedFileName;
+
+  if lFileName.IsEmpty then
+    Exit;
+
+  lMemTable := TFDLogViewer.Create(nil);
+  try
+    lMemTable.CopyDataSet(LogViewer, [coRestart, coAppend]);
+    lMemTable.SaveToFile(lFileName);
+  finally
+    lMemTable.Free;
+  end;
+end;
+
+procedure TfMonitor.MenuItemGoToBookmarkClick(Sender: TObject);
+begin
+  LogViewer.UseBookMark;
+end;
+
+procedure TfMonitor.MenuItemSetBookmarkClick(Sender: TObject);
+begin
+  SetBookmark;
 end;
 
 procedure TfMonitor.TabSheetSQLShow(Sender: TObject);

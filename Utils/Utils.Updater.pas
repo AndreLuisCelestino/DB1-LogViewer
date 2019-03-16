@@ -10,6 +10,7 @@ type
   private
     FApplicationPath: string;
 
+    function GetLocalFileDate: TDateTime;
     procedure CreateBackup;
     procedure GetApplicationPath;
     procedure ReplaceFiles(const aOldFile, aNewFile: string);
@@ -38,6 +39,11 @@ begin
   FApplicationPath := ExtractFilePath(Application.ExeName);
 end;
 
+function TUpdater.GetLocalFileDate: TDateTime;
+begin
+  FileAge(Application.ExeName, result);
+end;
+
 procedure TUpdater.ReplaceFiles(const aOldFile, aNewFile: string);
 var
   lOldFilePath, lNewFilePath: string;
@@ -58,11 +64,11 @@ end;
 function TUpdater.CheckForNewVersion: boolean;
 var
   lFile: TCollectionItem;
-  lLocalFileDate: TDateTime;
-  lFTPFileDate: TDateTime;
+  lIdFTPListItem: TIdFTPListItem;
   lIdFTP: TIdFTP;
 begin
   result := False;
+
   lIdFTP := TIdFTP.Create(nil);
   try
     SetServerProperties(lIdFTP);
@@ -71,12 +77,14 @@ begin
     lIdFTP.ChangeDir('/logviewer');
     lIdFTP.List(nil, EmptyStr, True);
 
-    FileAge(Application.ExeName, lLocalFileDate);
-
     for lFile in lIdFTP.DirectoryListing do
     begin
-      lFTPFileDate := Trunc((lFile as TIdFTPListItem).ModifiedDate);
-      result := lLocalFileDate < lFTPFileDate;
+      lIdFTPListItem := (lFile as TIdFTPListItem);
+
+      if not lIdFTPListItem.FileName.ToUpper.Equals('LOGVIEWER.EXE') then
+        Continue;
+
+      result := GetLocalFileDate < lIdFTPListItem.ModifiedDate;
     end;
   finally
     lIdFTP.Disconnect;
@@ -99,11 +107,9 @@ var
   lIdFTP: TIdFTP;
 begin
   lIdFTP := TIdFTP.Create(nil);
-  lLoadingForm := TfLoading.Create(nil);
+  lLoadingForm := TfLoading.Create(dmUpdating);
   try
     try
-      lLoadingForm.ShowUpdateMessage;
-
       GetApplicationPath;
       SetServerProperties(lIdFTP);
       lIdFTP.Connect;
