@@ -1,7 +1,7 @@
 object fMonitor: TfMonitor
   Left = 488
   Top = 0
-  Caption = 'DB1 LogViewer 2.1'
+  Caption = 'DB1 LogViewer 2.2'
   ClientHeight = 629
   ClientWidth = 1344
   Color = clBtnFace
@@ -541,6 +541,8 @@ object fMonitor: TfMonitor
     end
     object TabSheetOptions: TTabSheet
       Caption = 'Op'#231#245'es'
+      ExplicitLeft = 6
+      ExplicitTop = 26
       object GroupBoxLog: TGroupBox
         Left = 18
         Top = 16
@@ -682,14 +684,14 @@ object fMonitor: TfMonitor
         end
       end
       object GroupBoxShortCuts: TGroupBox
-        Left = 563
+        Left = 567
         Top = 16
-        Width = 217
-        Height = 259
+        Width = 234
+        Height = 308
         Caption = 'Atalhos: '
         TabOrder = 2
         object LabelCtrlO: TLabel
-          Left = 23
+          Left = 50
           Top = 24
           Width = 43
           Height = 13
@@ -702,7 +704,7 @@ object fMonitor: TfMonitor
           ParentFont = False
         end
         object LabelCtrlL: TLabel
-          Left = 25
+          Left = 52
           Top = 62
           Width = 41
           Height = 13
@@ -715,7 +717,7 @@ object fMonitor: TfMonitor
           ParentFont = False
         end
         object LabelF5: TLabel
-          Left = 53
+          Left = 80
           Top = 81
           Width = 13
           Height = 13
@@ -728,7 +730,7 @@ object fMonitor: TfMonitor
           ParentFont = False
         end
         object LabelCtrlC: TLabel
-          Left = 24
+          Left = 51
           Top = 107
           Width = 42
           Height = 13
@@ -741,7 +743,7 @@ object fMonitor: TfMonitor
           ParentFont = False
         end
         object LabelCtrlQ: TLabel
-          Left = 23
+          Left = 50
           Top = 144
           Width = 43
           Height = 13
@@ -754,7 +756,7 @@ object fMonitor: TfMonitor
           ParentFont = False
         end
         object LabelAlt1: TLabel
-          Left = 28
+          Left = 55
           Top = 193
           Width = 38
           Height = 13
@@ -767,7 +769,7 @@ object fMonitor: TfMonitor
           ParentFont = False
         end
         object LabelAlt2: TLabel
-          Left = 28
+          Left = 55
           Top = 212
           Width = 38
           Height = 13
@@ -780,7 +782,7 @@ object fMonitor: TfMonitor
           ParentFont = False
         end
         object LabelAlt3: TLabel
-          Left = 28
+          Left = 55
           Top = 231
           Width = 38
           Height = 13
@@ -793,56 +795,56 @@ object fMonitor: TfMonitor
           ParentFont = False
         end
         object LabelOpenFile: TLabel
-          Left = 72
+          Left = 98
           Top = 24
           Width = 70
           Height = 13
           Caption = ': Abrir Arquivo'
         end
         object LabelClearLog: TLabel
-          Left = 72
+          Left = 98
           Top = 62
           Width = 58
           Height = 13
           Caption = ': Limpar Log'
         end
         object LabelReloadLog: TLabel
-          Left = 72
+          Left = 98
           Top = 81
           Width = 69
           Height = 13
           Caption = ': Atualizar Log'
         end
         object LabelCopyColumnValue: TLabel
-          Left = 72
+          Left = 98
           Top = 107
           Width = 60
           Height = 13
           Caption = ': Copiar SQL'
         end
         object LabelCopySQL: TLabel
-          Left = 72
+          Left = 98
           Top = 145
           Width = 116
           Height = 13
           Caption = ': Copiar Valor da Coluna'
         end
         object LabelShowLogTab: TLabel
-          Left = 72
+          Left = 98
           Top = 193
           Width = 83
           Height = 13
           Caption = ': Exibir Aba "Log"'
         end
         object LabelShowSQLTab: TLabel
-          Left = 72
+          Left = 98
           Top = 212
           Width = 85
           Height = 13
           Caption = ': Exibir Aba "SQL"'
         end
         object LabelShowOptionsTab: TLabel
-          Left = 72
+          Left = 98
           Top = 231
           Width = 102
           Height = 13
@@ -851,19 +853,19 @@ object fMonitor: TfMonitor
         object BevelSeparator1: TBevel
           Left = 13
           Top = 100
-          Width = 191
+          Width = 205
           Height = 10
           Shape = bsTopLine
         end
         object BevelSeparator2: TBevel
           Left = 13
           Top = 185
-          Width = 191
+          Width = 205
           Height = 10
           Shape = bsTopLine
         end
         object LabelF4: TLabel
-          Left = 53
+          Left = 80
           Top = 165
           Width = 13
           Height = 13
@@ -876,14 +878,14 @@ object fMonitor: TfMonitor
           ParentFont = False
         end
         object LabelClearFilters: TLabel
-          Left = 72
+          Left = 98
           Top = 165
           Width = 70
           Height = 13
           Caption = ': Limpar Filtros'
         end
         object LabelCtrlU: TLabel
-          Left = 23
+          Left = 50
           Top = 43
           Width = 43
           Height = 13
@@ -896,14 +898,14 @@ object fMonitor: TfMonitor
           ParentFont = False
         end
         object LabelOpenLast: TLabel
-          Left = 72
+          Left = 98
           Top = 43
           Width = 82
           Height = 13
           Caption = ': Abrir '#218'ltimo Log'
         end
         object LabelCtrlM: TLabel
-          Left = 23
+          Left = 50
           Top = 126
           Width = 45
           Height = 13
@@ -916,11 +918,58 @@ object fMonitor: TfMonitor
           ParentFont = False
         end
         object LabelCopyMethodName: TLabel
-          Left = 72
+          Left = 98
           Top = 125
           Width = 122
           Height = 13
           Caption = ': Copiar Nome do M'#233'todo'
+        end
+        object Bevel1: TBevel
+          Left = 15
+          Top = 253
+          Width = 205
+          Height = 10
+          Shape = bsTopLine
+        end
+        object Label1: TLabel
+          Left = 10
+          Top = 263
+          Width = 83
+          Height = 13
+          Caption = 'Ctrl + Shift + 1'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label2: TLabel
+          Left = 98
+          Top = 263
+          Width = 68
+          Height = 13
+          Caption = ': Marcar Linha'
+        end
+        object Label3: TLabel
+          Left = 51
+          Top = 282
+          Width = 42
+          Height = 13
+          Caption = 'Ctrl + 1'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label4: TLabel
+          Left = 98
+          Top = 282
+          Width = 112
+          Height = 13
+          Caption = ': Ir para Linha Marcada'
         end
       end
       object GroupBoxSQL: TGroupBox

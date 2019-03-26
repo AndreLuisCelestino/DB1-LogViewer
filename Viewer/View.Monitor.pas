@@ -41,6 +41,7 @@ type
     FDMemTableFilterDateTime: TStringField;
     FDMemTableFilterError: TStringField;
     FDMemTableFilterIP: TStringField;
+    FDMemTableFilterLine: TIntegerField;
     FDMemTableFilterMethod: TStringField;
     FDMemTableFilterType: TStringField;
     FDMemTableFilterUser: TStringField;
@@ -77,6 +78,7 @@ type
     LabelForceToDateFunctionInfo: TLabel;
     LabelIgnoreBasicLogInfo: TLabel;
     LabelInterval: TLabel;
+    LabelNewVersionAvailable: TLabel;
     LabelOpenFile: TLabel;
     LabelOpenLast: TLabel;
     LabelReloadLog: TLabel;
@@ -91,6 +93,11 @@ type
     MenuItemCopyColumnValue: TMenuItem;
     MenuItemCopyMethodName: TMenuItem;
     MenuItemCopySQL: TMenuItem;
+    MenuItemExportData: TMenuItem;
+    MenuItemGoToBookmark: TMenuItem;
+    MenuItemSeparator1: TMenuItem;
+    MenuItemSeparator2: TMenuItem;
+    MenuItemSetBookmark: TMenuItem;
     PageControl: TPageControl;
     PanelDBGridFilter: TPanel;
     PanelFilterSQL: TPanel;
@@ -120,13 +127,11 @@ type
     ToggleSwitchShowOnlySQL: TToggleSwitch;
     ToggleSwitchStartMaximized: TToggleSwitch;
     ToggleSwitchStayOnTop: TToggleSwitch;
-    FDMemTableFilterLine: TIntegerField;
-    MenuItemSeparator2: TMenuItem;
-    MenuItemExportData: TMenuItem;
-    LabelNewVersionAvailable: TLabel;
-    MenuItemSeparator1: TMenuItem;
-    MenuItemSetBookmark: TMenuItem;
-    MenuItemGoToBookmark: TMenuItem;
+    Bevel1: TBevel;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
     procedure ActionClearCacheExecute(Sender: TObject);
     procedure ActionClearLogExecute(Sender: TObject);
     procedure ActionOpenFileExecute(Sender: TObject);

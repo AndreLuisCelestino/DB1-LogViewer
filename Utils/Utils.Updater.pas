@@ -11,11 +11,9 @@ type
     FApplicationPath: string;
 
     function GetLocalFileDate: TDateTime;
-    procedure CreateBackup;
+    procedure ConnectToFTP(var aIdFTP: TIdFTP);
     procedure GetApplicationPath;
     procedure ReplaceFiles(const aOldFile, aNewFile: string);
-    procedure RestoreBackup;
-    procedure SetServerProperties(var aIdFTP: TIdFTP);
   public
     function CheckForNewVersion: boolean;
     procedure UpdateApplication;
@@ -24,15 +22,10 @@ type
 implementation
 
 uses
-  System.SysUtils, System.Classes, System.Threading, System.UITypes, Winapi.Windows, VCL.Dialogs,
+  System.SysUtils, System.Classes, System.UITypes, Winapi.Windows, VCL.Dialogs,
   IdFTPList, ShellAPI, VCL.Forms, View.Loading, IdFTPCommon;
 
-{ TUpdater }
-
-procedure TUpdater.CreateBackup;
-begin
-  ReplaceFiles('LogViewer.exe', 'LogViewerBKP.exe');
-end;
+{ TUpdate }
 
 procedure TUpdater.GetApplicationPath;
 begin
@@ -50,15 +43,7 @@ var
 begin
   lOldFilePath := FApplicationPath + aOldFile;
   lNewFilePath := FApplicationPath + aNewFile;
-
-  DeleteFile(PWideChar(lNewFilePath));
   RenameFile(PWideChar(lOldFilePath), PWideChar(lNewFilePath));
-end;
-
-procedure TUpdater.RestoreBackup;
-begin
-  if not FileExists(FApplicationPath + 'LogViewer.exe') then
-    ReplaceFiles('LogViewerBKP.exe', 'LogViewer.exe');
 end;
 
 function TUpdater.CheckForNewVersion: boolean;
@@ -71,10 +56,7 @@ begin
 
   lIdFTP := TIdFTP.Create(nil);
   try
-    SetServerProperties(lIdFTP);
-
-    lIdFTP.Connect;
-    lIdFTP.ChangeDir('/logviewer');
+    ConnectToFTP(lIdFTP);
     lIdFTP.List(nil, EmptyStr, True);
 
     for lFile in lIdFTP.DirectoryListing do
@@ -92,13 +74,15 @@ begin
   end;
 end;
 
-procedure TUpdater.SetServerProperties(var aIdFTP: TIdFTP);
+procedure TUpdater.ConnectToFTP(var aIdFTP: TIdFTP);
 begin
   aIdFTP.Passive := True;
   aIdFTP.TransferType := ftBinary;
   aIdFTP.Host := 'ftp.alternasistema.info';
   aIdFTP.Username := 'u947802498.alterna';
   aIdFTP.Password := 'ftp#alterna2018';
+  aIdFTP.Connect;
+  aIdFTP.ChangeDir('/logviewer');
 end;
 
 procedure TUpdater.UpdateApplication;
@@ -109,21 +93,19 @@ begin
   lIdFTP := TIdFTP.Create(nil);
   lLoadingForm := TfLoading.Create(dmUpdating);
   try
-    try
-      GetApplicationPath;
-      SetServerProperties(lIdFTP);
-      lIdFTP.Connect;
-      lIdFTP.ChangeDir('/logviewer');
+    GetApplicationPath;
+    ConnectToFTP(lIdFTP);
 
-      lIdFTP.Get('LogViewer.exe', FApplicationPath + 'LogViewerNew.exe', True, False);
-      CreateBackup;
-      ReplaceFiles('LogViewerNew.exe', 'LogViewer.exe');
+    DeleteFile(PWideChar(FApplicationPath + 'LogViewerNew.exe'));
+    DeleteFile(PWideChar(FApplicationPath + 'LogViewerBKP.exe'));
 
-      lLoadingForm.Close;
-      MessageDlg('O LogViewer será reiniciado!', mtInformation, [mbOK], 0);
-    except
-      RestoreBackup;
-    end;
+    lIdFTP.Get('LogViewer.exe', FApplicationPath + 'LogViewerNew.exe', True, False);
+
+    ReplaceFiles('LogViewer.exe', 'LogViewerBKP.exe');
+    ReplaceFiles('LogViewerNew.exe', 'LogViewer.exe');
+
+    lLoadingForm.Close;
+    MessageDlg('O LogViewer será reiniciado!', mtInformation, [mbOK], 0);
 
     ShellExecute(Application.Handle, nil, PChar(Application.ExeName), nil, nil, SW_SHOWNORMAL);
     Application.Terminate;

@@ -92,7 +92,7 @@ var
   lCounter: integer;
 begin
   Self.Append;
-  FFieldLine.AsInteger := aCounter;
+  FFieldLine.AsInteger := Succ(aCounter);
   FFieldType.AsString := FStringListLine[POSITION_TYPE];
   FFieldDatabase.AsString := FStringListLine[POSITION_DATABASE];
   FFieldUser.AsString := FStringListLine[POSITION_USER];
@@ -309,7 +309,6 @@ end;
 procedure TFDLogViewer.ReloadLog;
 begin
   Self.EmptyDataSet;
-  FCounter := 0;
   LoadLog;
 end;
 
