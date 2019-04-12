@@ -626,11 +626,7 @@ begin
     Exit;
 
   SynMemoSQL.Lines.Clear;
-
-  if LogViewer.IsSQLEmpty then
-    Exit;
-
-  SynMemoSQL.Lines.Text := LogViewer.GetSQL.Replace('  ', sSPACE, [rfReplaceAll]);
+  SynMemoSQL.Lines.Text := LogViewer.GetSQL;
 end;
 
 procedure TfMonitor.LoadSQLTab;

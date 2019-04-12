@@ -309,6 +309,7 @@ end;
 procedure TFDLogViewer.ReloadLog;
 begin
   Self.EmptyDataSet;
+  FCounter := 0;
   LoadLog;
 end;
 

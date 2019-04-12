@@ -1,7 +1,7 @@
 object fMonitor: TfMonitor
   Left = 488
   Top = 0
-  Caption = 'DB1 LogViewer 2.2'
+  Caption = 'DB1 LogViewer 2.3'
   ClientHeight = 629
   ClientWidth = 1344
   Color = clBtnFace
@@ -413,6 +413,10 @@ object fMonitor: TfMonitor
       Caption = 'SQL'
       ImageIndex = 2
       OnShow = TabSheetSQLShow
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object SynMemoTab: TSynMemo
         Left = 0
         Top = 45
@@ -541,8 +545,10 @@ object fMonitor: TfMonitor
     end
     object TabSheetOptions: TTabSheet
       Caption = 'Op'#231#245'es'
-      ExplicitLeft = 6
-      ExplicitTop = 26
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBoxLog: TGroupBox
         Left = 18
         Top = 16
