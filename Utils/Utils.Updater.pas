@@ -14,6 +14,7 @@ type
     procedure ConnectToFTP(var aIdFTP: TIdFTP);
     procedure GetApplicationPath;
     procedure ReplaceFiles(const aOldFile, aNewFile: string);
+    procedure WaitForFileRenaming(const aFileName: string);
   public
     function CheckForNewVersion: boolean;
     procedure UpdateApplication;
@@ -102,7 +103,10 @@ begin
     lIdFTP.Get('LogViewer.exe', FApplicationPath + 'LogViewerNew.exe', True, False);
 
     ReplaceFiles('LogViewer.exe', 'LogViewerBKP.exe');
+    WaitForFileRenaming('LogViewerBKP.exe');
+
     ReplaceFiles('LogViewerNew.exe', 'LogViewer.exe');
+    WaitForFileRenaming('LogViewer.exe');
 
     lLoadingForm.Close;
     MessageDlg('O LogViewer será reiniciado!', mtInformation, [mbOK], 0);
@@ -113,6 +117,13 @@ begin
     lLoadingForm.Free;
     lIdFTP.Free;
   end;
+end;
+
+procedure TUpdater.WaitForFileRenaming(const aFileName: string);
+begin
+  Repeat
+    Sleep(500);
+  Until FileExists(FApplicationPath + aFileName);
 end;
 
 end.

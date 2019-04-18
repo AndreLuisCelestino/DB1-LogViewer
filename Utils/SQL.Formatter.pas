@@ -91,7 +91,7 @@ begin
       Break;
   end;
 
-  // Remove '(' e ')'
+  // Remove '(' and ')'
   result := Copy(result, 2, result.Length - 2);
 end;
 
@@ -143,7 +143,6 @@ end;
 function TSQLFormatter.PrepareSQL(const aSQL: string): string;
 begin
   result := ReplaceAllStrings(aSQL, '  ', sSPACE);
-  //result := ReplaceAllStrings(result, ',', ', ');
   result := ReplaceAllStrings(result, ' )', ')');
   result := ReplaceAllStrings(result, '( ', '(');
   result := ReplaceAllStrings(result, 'LEFT JOIN', 'LEFT_JOIN');
@@ -153,6 +152,7 @@ begin
   result := ReplaceAllStrings(result, 'RIGHT OUTER JOIN', 'RIGHT_OUTER_JOIN');
   result := ReplaceAllStrings(result, 'ORDER BY', 'ORDER_BY');
   result := ReplaceAllStrings(result, 'GROUP BY', 'GROUP_BY');
+  result := result.Trim;
 end;
 
 procedure TSQLFormatter.ProcessClause(const aValue: string; aBuilder: TStringBuilder);
@@ -242,7 +242,7 @@ begin
   // Set the margin of the SubSelect columns
   Inc(FMarginLevel, Succ(FSameLinePosition));
 
-  // "-5" is the offset of the keyword SELECT
+  // "-5" is the offset of the keyword "SELECT"
   Inc(aTokenPosition, lSubSelect.Length - 5);
 
   aBuilder
@@ -314,6 +314,9 @@ function TSQLFormatter.BreakLineNeeded(const aValue: string): boolean;
 var
   lLastCharacterIsComma: boolean;
 begin
+  if aValue.Length = 0 then
+    Exit(False);
+
   lLastCharacterIsComma := (aValue[aValue.Length] = ',');
   result := lLastCharacterIsComma and (not FSingleCommand);
 end;

@@ -1,7 +1,7 @@
 object fMonitor: TfMonitor
   Left = 488
   Top = 0
-  Caption = 'DB1 LogViewer 2.3'
+  Caption = 'DB1 LogViewer 2.4'
   ClientHeight = 629
   ClientWidth = 1344
   Color = clBtnFace
@@ -46,7 +46,7 @@ object fMonitor: TfMonitor
         Left = 0
         Top = 0
         Width = 1336
-        Height = 64
+        Height = 61
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 1
@@ -91,7 +91,7 @@ object fMonitor: TfMonitor
         end
         object GroupBoxAutoUpdate: TGroupBox
           Left = 606
-          Top = 4
+          Top = 2
           Width = 185
           Height = 54
           Caption = 'Atualiza'#231#227'o autom'#225'tica        '
@@ -128,9 +128,9 @@ object fMonitor: TfMonitor
       end
       object PanelGrid: TPanel
         Left = 0
-        Top = 64
+        Top = 61
         Width = 1336
-        Height = 379
+        Height = 382
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 0
@@ -138,7 +138,7 @@ object fMonitor: TfMonitor
           Left = 0
           Top = 39
           Width = 1336
-          Height = 340
+          Height = 343
           Align = alClient
           DataSource = DataSource
           Options = [dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgAlwaysShowSelection, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
@@ -413,10 +413,6 @@ object fMonitor: TfMonitor
       Caption = 'SQL'
       ImageIndex = 2
       OnShow = TabSheetSQLShow
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object SynMemoTab: TSynMemo
         Left = 0
         Top = 45
@@ -545,10 +541,6 @@ object fMonitor: TfMonitor
     end
     object TabSheetOptions: TTabSheet
       Caption = 'Op'#231#245'es'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBoxLog: TGroupBox
         Left = 18
         Top = 16
